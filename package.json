@@ -1,0 +1,21 @@
+{
+  "dependencies": {
+    "chart.js": "^4.4.7"
+  },
+  "name": "carrostream",
+  "version": "1.0.0",
+  "description": "This is a Solution to streamline services in the autocare industry in Kenya",
+  "main": "index.js",
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:css": "tailwindcss -i ./static/input.css -o ./static/css/output.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

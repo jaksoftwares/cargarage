@@ -1,0 +1,53 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block body %}
+{% include 'partials/page-banner.html' %}
+{% comment %} services {% endcomment %}
+<section class="services-overview">
+  <div class="services-container">
+    <h2>Our Services</h2>
+    <div class="services-grid">
+      {% for service in services %}
+        <div class="service-item" onclick="showServiceDetails('{{ service.slug }}')">
+          <img src="{{ service.image.url }}" alt="{{ service.title }}">
+          <h3>{{ service.title }}</h3>
+          <p>{{ service.description }}</p>
+          <p><strong>Price:</strong> Ksh {{ service.price }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+  
+  <!-- Modal for Details -->
+  <div id="serviceDetailsModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+   <!-- Customer Testimonials Section -->
+<section class="testimonials-section">
+    <h2>What Our Customers Say</h2>
+    <div class="testimonials-container">
+        <!-- Testimonial 1 -->
+        <div class="testimonial-card">
+            <p class="testimonial-text">
+                “CarroStream has been a lifesaver for me. The booking system is so easy to use, and I love that I can pay through MPESA. I’ll definitely be coming back!”
+            </p>
+            <p class="testimonial-author">– Jane M.</p>
+            <p class="testimonial-rating">⭐ 4.8/5</p>
+        </div>
+        <!-- Testimonial 2 -->
+        <div class="testimonial-card">
+            <p class="testimonial-text">
+                “I’ve used several auto repair shops, but none are as reliable as CarroStream. They communicate clearly about pricing, and their service is top-notch.”
+            </p>
+            <p class="testimonial-author">– David O.</p>
+            <p class="testimonial-rating">⭐ 4.8/5</p>
+        </div>
+    </div>
+  </section>
+{% endblock %}

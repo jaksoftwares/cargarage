@@ -1,0 +1,586 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarroStream Admin Dashboard</title>
+    {% block css %}
+    <link rel="stylesheet" href="{% static 'dashboard/css/siteadmin_dashboard.css' %}">
+    {% endblock %} 
+    <script>
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    </script>
+</head>
+<body>
+    <div class="admin-dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h2>CarroStream Admin</h2>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active">Dashboard</a></li>
+                    <li><a href="#">Manage Services</a></li>
+                    <li><a href="#">Manage Pricing</a></li>
+                    <li><a href="#">Manage Team</a></li>
+                    <li><a href="#">Manage Testimonials</a></li>
+                    <li><a href="#">Manage FAQs</a></li>
+                    <li><a href="#">Bookings</a></li>
+                    <li><a href="#">Payments</a></li>
+                    <li><a href="#">Media Manager</a></li>
+                    <li><a href="#">Settings</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header>
+                <h1>Welcome, Admin!</h1>
+                <p>Manage CarroStream efficiently.</p>
+            </header>
+            <section class="content">
+                <!-- Dashboard Cards -->
+                <div class="cards">
+                    <div class="card">
+                        <h3>Total Services</h3>
+                        <p>{{ total_services }}</p>
+                    </div>
+                    <div class="card">
+                        <h3>Total Users</h3>
+                        <p>{{ total_users }}</p>
+                    </div>
+                    <div class="card">
+                        <h3>Revenue</h3>
+                        <p>Ksh {{ total_revenue }}</p>
+                    </div>
+                    <div class="card">
+                        <h3>Pending Appointments</h3>
+                        <p>{{ pending_bookings }}</p>
+                    </div>
+                </div>
+            </section>
+            
+
+<!-- Manage Services Section -->
+<div id="dynamic-section">
+    <h2>Manage Services</h2>
+    <button id="add-service-btn">Add Service</button>
+    <table id="services-table">
+        <thead>
+            <tr>
+                <th>Service</th>
+                <th>Price</th>
+                <th>Image</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for service in services %}
+            <tr id="service-{{ service.id }}">
+                <td>{{ service.title }}</td>
+                <td>{{ service.price }}</td>
+                <td>
+                    {% if service.image %}
+                        <img src="{{ service.image.url }}" alt="Service Image" width="50">
+                    {% else %}
+                        <img src="{% static 'dashboard/img/placeholder.png' %}" alt="No image" width="50">
+                    {% endif %}
+                </td>
+                <td>
+                    <button onclick="editService('{{ service.id }}')">Edit</button>
+                    <button onclick="deleteService('{{ service.id }}')">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Manage Pricing Section -->
+{% comment %} <div id="dynamic-section">
+    <h2>Manage Pricing</h2>
+    <button id="add-pricing-btn">Add Pricing Plan</button>
+    <table id="pricing-table">
+        <thead>
+            <tr>
+                <th>Plan</th>
+                <th>Features</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for plan in pricing %}
+            <tr id="pricing-{{ plan.id }}">
+                <td>{{ plan.name }}</td>
+                <td>{{ plan.features }}</td>
+                <td>{{ plan.price }}</td>
+                <td>
+                    <button onclick="editPricing('{{ plan.id }}')">Edit</button>
+                    <button onclick="deletePricing('{{ plan.id }}')">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div> {% endcomment %}
+
+<!-- Manage Team Section -->
+<div id="dynamic-section">
+    {% comment %} <h2>Manage Team</h2>
+    <button id="add-team-btn">Add Team Member</button>
+    <table id="team-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for member in team %}
+            <tr id="team-{{ member.id }}">
+                <td>{{ member.name }}</td>
+                <td>{{ member.role }}</td>
+                <td>
+                    <button onclick="editTeam('{{ member.id }}')">Edit</button>
+                    <button onclick="deleteTeam('{{ member.id }}')">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table> {% endcomment %}
+    <h2>Contacts</h2>
+{% comment %} <button id="add-contact-btn">Add Contact</button> {% endcomment %}
+<table id="contacts-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Message</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for contact in contacts %}
+        <tr id="contact-{{ contact.id }}">
+            <td>{{ contact.name }}</td>
+            <td>{{ contact.email }}</td>
+            <td>{{ contact.phone }}</td>
+            <td>{{ contact.message }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<!-- Manage Testimonials Section -->
+<div id="dynamic-section">
+    <h2>Manage Testimonials</h2>
+    <button id="add-testimonial-btn">Add Testimonial</button>
+    <table id="testimonials-table">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Feedback</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for testimonial in testimonials %}
+            <tr id="testimonial-{{ testimonial.id }}">
+                <td>{{ testimonial.user }}</td>
+                <td>{{ testimonial.feedback }}</td>
+                <td>
+                    <button onclick="editTestimonial('{{ testimonial.id }}')">Edit</button>
+                    <button onclick="deleteTestimonial('{{ testimonial.id }}')">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Manage FAQs Section -->
+<div id="dynamic-section">
+    <h2>Manage FAQs</h2>
+    <button id="add-faq-btn">Add FAQ</button>
+    <table id="faqs-table">
+        <thead>
+            <tr>
+                <th>Question</th>
+                <th>Answer</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for faq in faqs %}
+            <tr id="faq-{{ faq.id }}">
+                <td>{{ faq.question }}</td>
+                <td>{{ faq.answer }}</td>
+                <td>
+                    <button onclick="editFaq('{{ faq.id }}')">Edit</button>
+                    <button onclick="deleteFaq('{{ faq.id }}')">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Manage Bookings Section -->
+<div id="dynamic-section">
+    <h2>Manage Bookings</h2>
+    <button id="add-booking-btn">Add Booking</button>
+    <table id="bookings-table">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Service</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+            <tr id="booking-{{ booking.id }}">
+                <td>{{ booking.user }}</td>
+                <td>{{ booking.service }}</td>
+                <td>{{ booking.date }}</td>
+                <td>{{ booking.status }}</td>
+                <td>
+                    <button onclick="editBooking('{{ booking.id }}')">Edit</button>
+                    <button onclick="deleteBooking('{{ booking.id }}')">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Manage Payments Section -->
+<div id="dynamic-section">
+    <h2>Manage Payments</h2>
+    <button id="add-payment-btn">Add Payment</button>
+    <table id="payments-table">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payment in payments %}
+            <tr id="payment-{{ payment.id }}">
+                <td>{{ payment.user }}</td>
+                <td>{{ payment.amount }}</td>
+                <td>{{ payment.date }}</td>
+                <td>
+                    <button onclick="viewPayment('{{ payment.id }}')">View</button>
+                    <button onclick="deletePayment('{{ payment.id }}')">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Media Manager Section -->
+<div id="dynamic-section">
+    <h2>Media Manager</h2>
+    <button id="upload-media-btn">Upload Media</button>
+    <p>{% if media|length > 0 %} Media available for management. {% else %} No media available yet. Start uploading! {% endif %}</p>
+</div>
+
+                <!-- Settings Section -->
+                <div id="dynamic-section">
+                    <h2>Settings</h2>
+                    <form>
+                        <label for="site-title">Site Title:</label>
+                        <input type="text" id="site-title" value="CarroStream">
+                        <label for="contact-email">Contact Email:</label>
+                        <input type="email" id="contact-email" value="admin@carrostream.com">
+                        <button>Save Changes</button>
+                    </form>
+                </div>
+
+
+                                <!-- Form for Adding or Editing a Service -->
+                                <div id="add-service-form" style="display: none;" class="add-form">
+                                    <h3 id="form-title">Add Service</h3>
+                                    <form id="service-form-content" method="POST" enctype="multipart/form-data" action="{% url 'services:add_service' %}" data-edit-url="{% url 'services:edit_service' service_id=0 %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" id="service-id" name="service-id">
+                                    
+                                        <label for="title">Title</label>
+                                        <input type="text" id="title" name="title" required>
+                                    
+                                        <label for="price">Price</label>
+                                        <input type="number" id="price" name="price" required>
+                                    
+                                        <label for="description">Description</label>
+                                        <textarea id="description" name="description" required></textarea>
+                                    
+                                        <label for="image">Image</label>
+                                        <input type="file" id="image" name="image" accept="image/*">
+                                    
+                                        <button type="submit" id="submit-btn">Save</button>
+                                    </form>
+                                </div>
+
+                                
+
+                                <!-- Form for Adding or Editing a Team Member -->
+                            <div id="team-form" style="display: none;" class="add-form">
+                                <h3 id="form-title">Add Team Member</h3>
+                                <form id="team-form-content" method="POST" enctype="multipart/form-data" action="{% url 'services:add_team_member' %}" data-edit-url="{% url 'services:edit_team_member' team_member_id=0 %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" id="team-id" name="team-id">
+                                    
+                                    <label for="name">Name</label>
+                                    <input type="text" id="name" name="name" required>
+                                    
+                                    <label for="role">Role</label>
+                                    <input type="text" id="role" name="role" required>
+                                    
+                                    <label for="profile-picture">Profile Picture</label>
+                                    <input type="file" id="profile-picture" name="profile-picture" accept="image/*">
+                                    
+                                    <button type="submit" id="submit-btn">Save</button>
+                                </form>
+                            </div>
+
+                            {% comment %} <div id="pricing-form" style="display: none;">
+                                    <h3 id="form-title">Add Pricing Plan</h3>
+                                    <form id="pricing-form-content" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" id="pricing-id" name="pricing-id">
+                                
+                                        <label for="plan">Plan Name</label>
+                                        <input type="text" id="plan" name="plan" required>
+                                
+                                        <label for="features">Features</label>
+                                        <textarea id="features" name="features" required></textarea>
+                                
+                                        <label for="price">Price</label>
+                                        <input type="number" id="price" name="price" required>
+                                
+                                        <button type="submit" id="submit-btn">Save</button>
+                                    </form>
+                                </div> {% endcomment %}
+
+                            <!-- Form for Adding or Editing a Testimonial -->
+                            {% comment %} <div id="testimonial-form" style="display: none;" class="add-form">
+                                <h3 id="form-title">Add Testimonial</h3>
+                                <form id="testimonial-form-content" method="POST" action="{% url 'services:add_testimonial' %}" data-edit-url="{% url 'services:edit_testimonial' testimonial_id=0 %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" id="testimonial-id" name="testimonial-id">
+                                    
+                                    <label for="user">User</label>
+                                    <input type="text" id="user" name="user" required>
+                                    
+                                    <label for="feedback">Feedback</label>
+                                    <textarea id="feedback" name="feedback" required></textarea>
+                                    
+                                    <button type="submit" id="submit-btn">Save</button>
+                                </form>
+                            </div> {% endcomment %}
+
+                            <!-- Form for Adding or Editing a Booking -->
+                            {% comment %} <div id="booking-form" style="display: none;" class="add-form">
+                                <h3 id="form-title">Add Booking</h3>
+                                <form id="booking-form-content" method="POST" action="{% url 'services:add_booking' %}" data-edit-url="{% url 'services:edit_booking' booking_id=0 %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" id="booking-id" name="booking-id">
+                                    
+                                    <label for="user">User</label>
+                                    <input type="text" id="user" name="user" required>
+                                    
+                                    <label for="service">Service</label>
+                                    <input type="text" id="service" name="service" required>
+                                    
+                                    <label for="date">Date</label>
+                                    <input type="date" id="date" name="date" required>
+                                    
+                                    <label for="status">Status</label>
+                                    <select id="status" name="status" required>
+                                        <option value="pending">Pending</option>
+                                        <option value="completed">Completed</option>
+                                    </select>
+                                    
+                                    <button type="submit" id="submit-btn">Save</button>
+                                </form>
+                            </div> {% endcomment %}
+
+                            <!-- Form for Adding or Editing a Payment -->
+                            {% comment %} <div id="payment-form" style="display: none;" class="add-form">
+                                <h3 id="form-title">Add Payment</h3>
+                                <form id="payment-form-content" method="POST" action="{% url 'services:add_payment' %}" data-edit-url="{% url 'services:edit_payment' payment_id=0 %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" id="payment-id" name="payment-id">
+                                    
+                                    <label for="user">User</label>
+                                    <input type="text" id="user" name="user" required>
+                                    
+                                    <label for="amount">Amount</label>
+                                    <input type="number" id="amount" name="amount" required>
+                                    
+                                    <label for="date">Date</label>
+                                    <input type="date" id="date" name="date" required>
+                                    
+                                    <button type="submit" id="submit-btn">Save</button>
+                                </form>
+                            </div> {% endcomment %}
+
+
+  <!-- Service Edit Form (Initially Hidden) -->
+  <div id="edit-service-form" style="display: none;">
+    <h3>Edit Service</h3>
+    <form id="edit-service-form-content" method="POST">
+        {% csrf_token %}
+        <input type="hidden" id="service-id" name="id">
+        <label for="title">Title</label>
+        <input type="text" id="edit-title" name="title" required><br>
+
+        <label for="price">Price</label>
+        <input type="text" id="edit-price" name="price" required><br>
+
+        <label for="description">Description</label>
+        <textarea id="edit-description" name="description" required></textarea><br>
+
+        <label for="image">Image</label>
+        <input type="file" id="edit-image" name="image"><br>
+
+        <button type="submit">Save Changes</button>
+    </form>
+</div>
+                <!-- Manage Pricing Edit Form -->
+<div id="edit-pricing-form" style="display: none;">
+    <h3>Edit Pricing Plan</h3>
+    <form id="edit-pricing-form-content" method="POST">
+        {% csrf_token %}
+        <input type="hidden" id="pricing-id" name="id" value="{{ pricing.id }}">
+        
+        <label for="plan-name">Plan Name</label>
+        <input type="text" id="edit-plan-name" name="plan_name" value="{{ pricing.plan_name }}" required>
+        
+        <label for="features">Features</label>
+        <textarea id="edit-features" name="features" required>{{ pricing.features }}</textarea>
+        
+        <label for="price">Price</label>
+        <input type="number" id="edit-price" name="price" value="{{ pricing.price }}" required>
+        
+        <button type="submit">Save Changes</button>
+    </form>
+</div>
+
+<!-- Manage Team Edit Form -->
+<div id="edit-team-form" style="display: none;">
+    <h3>Edit Team Member</h3>
+    <form id="edit-team-form-content" method="POST">
+        {% csrf_token %}
+        <input type="hidden" id="team-member-id" name="id" value="{{ team_member.id }}">
+        
+        <label for="name">Name</label>
+        <input type="text" id="edit-name" name="name" value="{{ team_member.name }}" required>
+        
+        <label for="role">Role</label>
+        <input type="text" id="edit-role" name="role" value="{{ team_member.role }}" required>
+        
+        <button type="submit">Save Changes</button>
+    </form>
+</div>
+
+<!-- Manage Testimonials Edit Form -->
+<div id="edit-testimonial-form" style="display: none;">
+    <h3>Edit Testimonial</h3>
+    <form id="edit-testimonial-form-content" method="POST">
+        {% csrf_token %}
+        <input type="hidden" id="testimonial-id" name="id" value="{{ testimonial.id }}">
+        
+        <label for="user">User</label>
+        <input type="text" id="edit-user" name="user" value="{{ testimonial.user }}" required>
+        
+        <label for="feedback">Feedback</label>
+        <textarea id="edit-feedback" name="feedback" required>{{ testimonial.feedback }}</textarea>
+        
+        <button type="submit">Save Changes</button>
+    </form>
+</div>
+
+<!-- Manage FAQs Edit Form -->
+<div id="edit-faq-form" style="display: none;">
+    <h3>Edit FAQ</h3>
+    <form id="edit-faq-form-content" method="POST">
+        {% csrf_token %}
+        <input type="hidden" id="faq-id" name="id" value="{{ faq.id }}">
+        
+        <label for="question">Question</label>
+        <input type="text" id="edit-question" name="question" value="{{ faq.question }}" required>
+        
+        <label for="answer">Answer</label>
+        <textarea id="edit-answer" name="answer" required>{{ faq.answer }}</textarea>
+        
+        <button type="submit">Save Changes</button>
+    </form>
+</div>
+
+<!-- Manage Bookings Edit Form -->
+<div id="edit-booking-form" style="display: none;">
+    <h3>Edit Booking</h3>
+    <form id="edit-booking-form-content" method="POST">
+        {% csrf_token %}
+        <input type="hidden" id="booking-id" name="id" value="{{ booking.id }}">
+        
+        <label for="user">User</label>
+        <input type="text" id="edit-user" name="user" value="{{ booking.user }}" required>
+        
+        <label for="service">Service</label>
+        <input type="text" id="edit-service" name="service" value="{{ booking.service }}" required>
+        
+        <label for="date">Date</label>
+        <input type="date" id="edit-date" name="date" value="{{ booking.date }}" required>
+        
+        <label for="status">Status</label>
+        <select id="edit-status" name="status" required>
+            <option value="Pending" {% if booking.status == 'Pending' %}selected{% endif %}>Pending</option>
+            <option value="Completed" {% if booking.status == 'Completed' %}selected{% endif %}>Completed</option>
+            <option value="Canceled" {% if booking.status == 'Canceled' %}selected{% endif %}>Canceled</option>
+        </select>
+        
+        <button type="submit">Save Changes</button>
+    </form>
+</div>
+
+<!-- Manage Payments Edit Form -->
+<div id="edit-payment-form" style="display: none;">
+    <h3>Edit Payment</h3>
+    <form id="edit-payment-form-content" method="POST">
+        {% csrf_token %}
+        <input type="hidden" id="payment-id" name="id" value="{{ payment.id }}">
+        
+        <label for="user">User</label>
+        <input type="text" id="edit-user" name="user" value="{{ payment.user }}" required>
+        
+        <label for="amount">Amount</label>
+        <input type="number" id="edit-amount" name="amount" value="{{ payment.amount }}" required>
+        
+        <label for="date">Date</label>
+        <input type="date" id="edit-date" name="date" value="{{ payment.date }}" required>
+        
+        <button type="submit">Save Changes</button>
+    </form>
+</div>
+
+            </section>
+        </main>
+    </div>
+    
+    <script src="{% static 'dashboard/js/siteadmin.js'%}" ></script>
+</body>
+</html>
